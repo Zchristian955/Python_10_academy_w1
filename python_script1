@@ -1,0 +1,218 @@
+import os
+os.chdir("C:/Users/hp/Documents")
+
+import numpy as np 
+import pandas as pd
+
+import warnings
+warnings.filterwarnings('ignore')
+pd.set_option('max_column', None)
+data1 = pd.read_csv("Week1.csv", na_values=['?', None])
+## let compute the total number of bytes for each application
+data2 = data1[['Bearer Id','Social Media DL (Bytes)','Social Media UL (Bytes)','Google DL (Bytes)','Google UL (Bytes)',
+ 'Email DL (Bytes)','Email UL (Bytes)','Youtube DL (Bytes)','Youtube UL (Bytes)','Netflix DL (Bytes)','Netflix UL (Bytes)',
+ 'Gaming DL (Bytes)','Gaming UL (Bytes)','Total UL (Bytes)','Total DL (Bytes)','Dur. (ms)']]
+ 
+ 
+ total_Social_media = data2['Social Media DL (Bytes)'] + data2['Social Media UL (Bytes)']
+total_Google = data2['Google DL (Bytes)']+data2['Google UL (Bytes)']
+total_Email = data2['Email DL (Bytes)']+data2['Email UL (Bytes)']
+total_Youtube = data2['Youtube DL (Bytes)']+data2['Youtube UL (Bytes)']
+total_Netflix = data2['Youtube DL (Bytes)']+data2['Youtube UL (Bytes)']
+total_Gaming = data2['Gaming DL (Bytes)']+data2['Gaming UL (Bytes)']
+
+#let add it on the dataframe
+data2['total_Social_media']= total_Social_media
+data2['total_Google']=total_Google
+data2['total_Email']=total_Email
+data2['total_Youtube']=total_Youtube
+data2['total_Netflix']=total_Netflix
+data2['total_Gaming']=total_Gaming
+
+
+
+
+data3= data2[['Social Media DL (Bytes)','Social Media UL (Bytes)','Google DL (Bytes)','Google UL (Bytes)',
+ 'Email DL (Bytes)','Email UL (Bytes)','Youtube DL (Bytes)','Youtube UL (Bytes)','Netflix DL (Bytes)','Netflix UL (Bytes)',
+ 'Gaming DL (Bytes)','Gaming UL (Bytes)','Total UL (Bytes)','Total DL (Bytes)','Dur. (ms)','total_Social_media','total_Google',
+ 'total_Email','total_Youtube','total_Gaming','total_Netflix' ]]
+
+## types
+#data2.dtypes
+#descriptive statistic
+data3.describe()
+
+
+
+
+from sklearn.preprocessing import MinMaxScaler
+
+minmax_scaler = MinMaxScaler()
+
+def scaler(df):
+    scaled_data = minmax_scaler.fit_transform(df)
+    return scaled_data
+
+scaler(data3)
+
+
+
+
+# plot  showing  the shape of distribution  of variable such as  Total UL (Bytes), Total DL (Bytes) and Dur. (ms)
+import seaborn as sns
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots(1,3, figsize=(10, 6))
+sns.histplot(data3['Total UL (Bytes)'],ax=ax[0])
+ax[0].set_title("Total UL (Bytes)")
+sns.histplot(data3['Total DL (Bytes)'],ax=ax[1])
+ax[1].set_title("Total DL (Bytes)")
+sns.histplot(data3['Dur. (ms)'],ax=ax[2])
+ax[2].set_title("Dur. (ms)")
+
+
+
+
+#plot
+fig, ax = plt.subplots(1,3, figsize=(10, 6))
+sns.histplot(data3['total_Social_media'],ax=ax[0])
+ax[0].set_title("total_Social_media")
+sns.histplot(data3['total_Google'],ax=ax[1])
+ax[1].set_title("total_Google")
+sns.histplot(data3['total_Email'],ax=ax[2])
+ax[2].set_title("total_Email")
+
+
+#plot 
+fig, ax = plt.subplots(1,3, figsize=(10, 6))
+sns.histplot(data3['total_Youtube'],ax=ax[0])
+ax[0].set_title("total_Youtube")
+sns.histplot(data3['total_Gaming'],ax=ax[1])
+ax[1].set_title("total_Gaming")
+sns.histplot(data3['total_Netflix'],ax=ax[2])
+ax[2].set_title("total_Netflix")
+
+
+
+
+data3['DL+UL ']= data3['Total UL (Bytes)']+data3['Total UL (Bytes)']
+data3.columns.tolist
+
+
+#biplot
+data3.plot.scatter(x='DL+UL ', y='total_Youtube')
+data3.plot.scatter(x='DL+UL ', y='total_Social_media')
+data3.plot.scatter(x='DL+UL ', y='total_Google')
+data3.plot.scatter(x='DL+UL ', y='total_Email')
+data3.plot.scatter(x='DL+UL ', y='total_Gaming')
+data3.plot.scatter(x='DL+UL ', y='total_Email')
+
+
+
+
+
+## segmentation 
+# Sorting the DataFrame in Ascending Order of total  Duration
+data3.sort_values(by =['Dur. (ms)'], inplace = True)
+
+######### let's segment the users into top five decile classes based on the total duration for all 
+#sessions and compute the total data (DL+UL) per decile class
+data3['DecileRank']= pd.qcut(data3['Dur. (ms)'], 
+                           q = 5, labels = False)
+
+data3['DecileRank'].value_counts()
+
+######################## 0, 1,2,3,4 are the different top five deciles 
+rslt_0 = data3[data3['DecileRank'] ==0]
+rslt_1 = data3[data3['DecileRank'] == 1]
+rslt_2 = data3[data3['DecileRank'] == 2]
+rslt_3 = data3[data3['DecileRank'] == 3]
+rslt_4 = data3[data3['DecileRank'] == 4]
+
+
+rslt_0.corr()
+rslt_1.corr()
+rslt_2.corr()
+rslt_3.corr()
+rslt_4.corr()
+
+
+
+# Let find the columns which contains missing values 
+
+data3.isna().sum()
+
+###########################
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+#plot
+fig, ax = plt.subplots(1,3, figsize=(10, 6))
+sns.histplot(data2['Total DL (Bytes)'],ax= ax[0])
+
+sns.histplot(data2['Total UL (Bytes)'],ax= ax[1])
+sns.histplot(data2['Dur. (ms)'],ax=ax[2])
+
+
+
+
+#fix the missing values
+def fix_missing_ffill(df, col):
+    df[col] = df[col].fillna(method='ffill')
+    return df[col]
+
+
+
+data3['Total DL (Bytes)'] = fix_missing_ffill(data3, 'Total DL (Bytes)')
+
+# for Total UL (Bytes) variable I  will use the mean base on  the bell shape
+
+data3['Total UL (Bytes)'] = data3['Total UL (Bytes)'].fillna(data3['Total UL (Bytes)'].mean())
+
+##Dur. (ms)
+
+data3['Dur. (ms)'] = data3['Dur. (ms)'].fillna(data3['Dur. (ms)'].median())
+
+
+
+
+
+
+
+data3['DecileRank'] = fix_missing_ffill(data3, 'DecileRank')
+data3['DL+UL '] = fix_missing_ffill(data3, 'DL+UL ')
+data3.isna().sum()
+
+
+
+# Feature Scaling
+from sklearn.preprocessing import StandardScaler
+features = data3[['Total UL (Bytes)','Total DL (Bytes)','Dur. (ms)','total_Social_media','total_Google',
+ 'total_Email','total_Youtube','total_Gaming','total_Netflix']]
+
+# Standardizing the features
+x = StandardScaler().fit_transform(features)
+
+
+#PCA
+from sklearn.decomposition import PCA
+pca = PCA(n_components=2)
+
+projected = pca.fit_transform(x)
+
+projected
+
+
+print(data3.shape)
+print(projected.shape)
+print(pca.components_)
+print(pca.explained_variance_)
+
+plt.plot(np.cumsum(pca.explained_variance_ratio_))
+plt.xlabel('number of components')
+plt.ylabel('cumulative explained variance');
+
+
+
+
+
+ 
