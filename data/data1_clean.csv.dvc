@@ -1,0 +1,4 @@
+outs:
+- md5: 96bc32f78dadeb59bdcb76bc291188a9
+  size: 64325269
+  path: data1_clean.csv
