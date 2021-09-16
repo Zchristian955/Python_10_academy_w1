@@ -11,8 +11,13 @@ The investor is interested in purchasing TellCo, an existing mobile service prov
 
 
 
-##data The data used is on the folder data. The features described can be found also in the folder data.
-### notebook contained data preprocessing, data exploration , PCA
-### script contained script for plot, PCA, data cleaning
-### dvc  dvc folder
-### test   Here, we perform an unitest
+## data 
+The data used is on the folder data. The features described can be found also in the folder data.
+## notebook 
+contained data preprocessing, data exploration , PCA
+## script 
+contained script for plot, PCA, data cleaning
+## dvc  
+dvc folder
+## test
+Here, we perform an unitest
